@@ -1,0 +1,53 @@
+Procedures Criadas
+Foram criadas procedures de manipulação de dados no banco company_constraints, utilizando estruturas condicionais para controlar as operações de inserção, atualização e remoção de registros.
+A variável de controle determina a ação a ser tomada e todos os parâmetros necessários são passados via parâmetros de entrada.
+A utilização de CASE torna a procedure dinâmica e fácil de adaptar para outras tabelas ou contextos.
+
+USE company_constraints;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_manage_employee(
+    IN action_type INT,
+    IN p_Fname VARCHAR(15),
+    IN p_Minit CHAR(1),
+    IN p_Lname VARCHAR(15),
+    IN p_Ssn CHAR(9),
+    IN p_Bdate DATE,
+    IN p_Address VARCHAR(30),
+    IN p_Sex CHAR(1),
+    IN p_Salary DECIMAL(10,2),
+    IN p_Super_ssn CHAR(9),
+    IN p_Dno INT
+)
+BEGIN
+    CASE action_type
+        WHEN 1 THEN 
+            -- Inserir novo empregado
+            INSERT INTO employee(Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dno)
+            VALUES(p_Fname, p_Minit, p_Lname, p_Ssn, p_Bdate, p_Address, p_Sex, p_Salary, p_Super_ssn, p_Dno);
+        
+        WHEN 2 THEN
+            -- Atualizar endereço do empregado
+            UPDATE employee
+            SET Address = p_Address
+            WHERE Ssn = p_Ssn;
+        
+        WHEN 3 THEN
+            -- Remover empregado
+            DELETE FROM employee
+            WHERE Ssn = p_Ssn;
+    END CASE;
+END //
+
+DELIMITER ;
+
+
+-- Inserir um empregado
+CALL sp_manage_employee(1, 'Lucas', 'S', 'Silva', '111222333', '1990-01-01', 'Rua Nova, 123', 'M', 5000.00, NULL, 1);
+
+-- Atualizar endereço do empregado
+CALL sp_manage_employee(2, '', '', '', '111222333', NULL, 'Rua Alterada, 456', '', NULL, NULL, NULL);
+
+-- Deletar empregado
+CALL sp_manage_employee(3, '', '', '', '111222333', NULL, '', '', NULL, NULL, NULL);
